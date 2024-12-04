@@ -4,9 +4,11 @@ This repository contains all of the necessary R, Python, and CSV files that were
 
 ## Description of content of notebook-project.ipynb
 
-In the notebook-project.ipynb file, the user can find all the code blocks used for extracting data related to the presidential elections within multiple districts (top 50 similar districts to TX-22) through extrapolation of precinct data. Furthermore, the user can find all the models used on the concatenated data in order to train various models and predict the outcome of the elections (Presidential and Congressional District Representative) and voter turnout.
+In the notebook-project.ipynb file, the user can find all the code blocks used for extracting data related to the congressional representative elections and the presidential elections within multiple districts (top 50 similar districts to TX-22) through extrapolation of precinct data. Furthermore, the user can find all the models used on the concatenated data in order to train various models and predict the outcome of the elections (Presidential and Congressional District Representative) and voter turnout.
 
 Due to the nature of this project, many of the blocks were run separately, and thus, libraries have been imported multiple times so that no libraries were missing while running the particular block of code.
+
+The user can analyze the spatial analysis done by our team by going through the files there (rmd, nb.html).
 
 ## Description of content of CSV files
 
@@ -29,6 +31,7 @@ Our goal was to have the entire team working at the same time on the data, which
 
 cs579Dataset.R is the main file that we used for gathering the aggreed-upon data. homeowner_data_added is one of the last R files we created because we thought that adding homeownership as a feature could be important, as we were inspired by one of our Final exam questions. merge-mine-matthew.R is an important file that merged intermediate results related to demographics and congressional representative elections.
 
+A separate folder containing an rmd file was added as it includes our work on spatial analysis.
 
 ## Description of content of folders "congressional_data", "precinct_data", and "pres_results"
 
