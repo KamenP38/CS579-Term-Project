@@ -1,0 +1,86 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+library(sf)
+library(dplyr)
+library(ggplot2)
+``` 
+
+```{r}
+tx_congdst_sf <- sf::st_read("tx_cong_2012_to_2021/tx_cong_2012_to_2021.shp")
+
+nrow(tx_congdst_sf)
+head(tx_congdst_sf)
+```
+
+```{r}
+ggplot(tx_congdst_sf) +
+  geom_sf() +
+  labs(title = "Texas Congressional Districts, 2021")
+```
+
+```{r}
+tx22 <- dplyr::filter(tx_congdst_sf, District == 22)
+ggplot(tx22) + 
+  geom_sf() + 
+  labs(title = "Texas Congressional District 22")
+```
+
+```{r}
+tx_prec_2022_sf <- sf::st_read("tx_2022_gen_tx_vtd/tx_2022_gen_tx_vtd.shp")
+nrow(tx_prec_2022_sf)
+head(tx_prec_2022_sf)
+```
+
+```{r}
+names(tx_prec_2022_sf)
+```
+
+```{r}
+tx22 <- st_transform(tx22, st_crs(tx_prec_2022_sf))
+tx22_mask <- sf::st_intersects(tx_prec_2022_sf, tx22, sparse = FALSE)
+tx22_precincts <- tx_prec_2022_sf[apply(tx22_mask, 1, any), ]
+```
+
+```{r}
+tx22_precincts <- tx22_precincts %>%
+  mutate(
+    GCON22RNEH = ifelse(is.na(GCON22RNEH), 0, GCON22RNEH),
+    GCON22DJOR = ifelse(is.na(GCON22DJOR), 0, GCON22DJOR),
+    GCON22LLEB = ifelse(is.na(GCON22LLEB), 0, GCON22LLEB),
+    GCON22OSQU = ifelse(is.na(GCON22OSQU), 0, GCON22OSQU)
+  )
+```
+
+```{r}
+tx22_precincts <- tx22_precincts %>%
+  filter(GCON22RNEH > 0 | GCON22DJOR > 0 | GCON22LLEB > 0 | GCON22OSQU > 0)
+```
+
+```{r}
+tx22_precincts <- tx22_precincts %>%
+  mutate(
+    majority = case_when(
+      GCON22RNEH > GCON22DJOR & GCON22RNEH > GCON22LLEB & GCON22RNEH > GCON22OSQU ~ "Nehls",     # Red
+      GCON22DJOR > GCON22RNEH & GCON22DJOR > GCON22LLEB & GCON22DJOR > GCON22OSQU ~ "Jordan",    # Blue
+      GCON22LLEB > GCON22RNEH & GCON22LLEB > GCON22DJOR & GCON22LLEB > GCON22OSQU ~ "LeBlanc",   # Green
+      GCON22OSQU > GCON22RNEH & GCON22OSQU > GCON22DJOR & GCON22OSQU > GCON22LLEB ~ "Squires"    # Yellow
+    )
+  )
+```
+
+```{r}
+ggplot(tx22_precincts) +
+  geom_sf(aes(fill = majority)) +
+  scale_fill_manual(
+    values = c("Nehls" = "red", "Jordan" = "blue", "LeBlanc" = "green", "Squires" = "yellow"), 
+    name = "Majority Candidate"
+  ) +
+  labs(title = "Texas Congressional District 22 - Precinct Voting Results") +
+  theme_minimal()
+```
